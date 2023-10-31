@@ -4,6 +4,7 @@ import com.api.rentchart.entities.User;
 import com.api.rentchart.exceptions.EtAuthException;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -22,6 +23,8 @@ public class UserRepository {
     private static final String SQL_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM RENT_CAR.USER WHERE USERNAME = ?";
     private static final String SQL_FIND_BY_ID = "SELECT ID, EMAIL, USERNAME, PASSWORD " +
             "FROM RENT_CAR.USER WHERE ID = ?";
+    private static final String SQL_FIND_BY_EMAIL = "SELECT ID, EMAIL, USERNAME, PASSWORD " +
+            "FROM RENT_CAR.USER WHERE EMAIL = ?";
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -40,6 +43,17 @@ public class UserRepository {
             return (UUID) keyHolder.getKeys().get("ID");
         }catch(Exception e){
             throw new EtAuthException("Detalles Invalidos. Fallido a crear cuenta");
+        }
+    }
+
+    public User findByEmailAndPassword(String email, String password) throws EtAuthException {
+        try{
+            User user = jdbcTemplate.queryForObject(SQL_FIND_BY_EMAIL, new Object[]{email}, userRowMapper);
+            if(!BCrypt.checkpw(password, user.getPassword()))
+                throw new EtAuthException("Password o email invalidos");
+            return user;
+        }catch(EmptyResultDataAccessException e){
+            throw new EtAuthException("Password o email invalidos");
         }
     }
 

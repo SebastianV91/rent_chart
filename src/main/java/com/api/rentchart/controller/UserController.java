@@ -24,6 +24,14 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, Object> userMap){
+        String email = (String) userMap.get("email");
+        String password = (String) userMap.get("password");
+        User user = userService.validateUser(email, password);
+        return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
+    }
+
     @PostMapping("/registro")
     public ResponseEntity<Map<String, String>> registroUsuario(@RequestBody Map<String, Object> userMap){
         String email = (String) userMap.get("email");

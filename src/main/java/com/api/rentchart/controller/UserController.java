@@ -27,8 +27,9 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, Object> userMap){
         String email = (String) userMap.get("email");
+        String username = (String) userMap.get("username");
         String password = (String) userMap.get("password");
-        User user = userService.validateUser(email, password);
+        User user = userService.validateUser(email, username, password);
         return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
     }
 

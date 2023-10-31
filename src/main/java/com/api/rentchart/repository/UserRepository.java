@@ -24,7 +24,7 @@ public class UserRepository {
     private static final String SQL_FIND_BY_ID = "SELECT ID, EMAIL, USERNAME, PASSWORD " +
             "FROM RENT_CAR.USER WHERE ID = ?";
     private static final String SQL_FIND_BY_EMAIL = "SELECT ID, EMAIL, USERNAME, PASSWORD " +
-            "FROM RENT_CAR.USER WHERE EMAIL = ?";
+            "FROM RENT_CAR.USER WHERE (EMAIL IS NULL OR EMAIL = ?) OR (USERNAME IS NULL OR USERNAME = ?)";
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -46,9 +46,9 @@ public class UserRepository {
         }
     }
 
-    public User findByEmailAndPassword(String email, String password) throws EtAuthException {
+    public User findByEmailAndPassword(String email, String username, String password) throws EtAuthException {
         try{
-            User user = jdbcTemplate.queryForObject(SQL_FIND_BY_EMAIL, new Object[]{email}, userRowMapper);
+            User user = jdbcTemplate.queryForObject(SQL_FIND_BY_EMAIL, new Object[]{email, username}, userRowMapper);
             if(!BCrypt.checkpw(password, user.getPassword()))
                 throw new EtAuthException("Password o email invalidos");
             return user;

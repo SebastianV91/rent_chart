@@ -17,9 +17,9 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public User validateUser(String email, String password) throws EtAuthException{
+    public User validateUser(String email, String username, String password) throws EtAuthException{
         if(email != null) email = email.toLowerCase();
-        return userRepository.findByEmailAndPassword(email, password);
+        return userRepository.findByEmailAndPassword(email, username, password);
     }
 
     public User registerUser(String email, String username, String password) throws EtAuthException {
